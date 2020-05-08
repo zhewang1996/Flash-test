@@ -1,33 +1,12 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:39:30 11/29/2019 
-// Design Name: 
-// Module Name:    QUAD_qspi_top 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
-//
-// Dependencies: 
-//
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
-//
-//////////////////////////////////////////////////////////////////////////////////
 module qspi_control
 (
-    input                I_clk               , //系统时钟
+    input                clk_25M             , //25M时钟
     input                I_rst_n             , //系统复位，低电平有效 
     
 	input                W_done_sig		     , //命令完成脉冲信号
 	input        [7:0]   W_read_data 		 ,
 	input      			 wr_req              ,
 	
-	output  reg          R_clk_25M           , //25M时钟，由50M系统时钟二分频
 	output  reg  [4:0]   R_cmd_type          , //命令类型
 	output  reg  [7:0]   R_flash_cmd		 ,
 	output  reg	 [23:0]  R_flash_addr		 ,
@@ -35,26 +14,14 @@ module qspi_control
 	output  reg  [7:0]   R_test_vec            //测试向量，决定写0还是写1  	 
 );
      
-(*KEEP = "TRUE"*)reg [3:0]   R_state             ;
-(*KEEP = "TRUE"*)reg [23:0]  R_addr_cnt          ;//地址计数
+reg [3:0]   R_state             ;
+reg [23:0]  R_addr_cnt          ;//地址计数
    
           
-     
-//功能：二分频逻辑          
-////////////////////////////////////////////////////////////////////          
-always @(posedge I_clk or negedge I_rst_n)
-begin
-    if(!I_rst_n) 
-        R_clk_25M   <=  1'b0        ;
-    else 
-        R_clk_25M   <=  ~R_clk_25M  ;
-end
-////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////
 //功能：测试状态机
 ////////////////////////////////////////////////////////////////////
-always @(posedge R_clk_25M or negedge I_rst_n)
+always @(posedge clk_25M or negedge I_rst_n)
 begin
     if(!I_rst_n) 
         begin
@@ -146,7 +113,7 @@ begin
                                 R_cmd_type  <= 5'b1_0011    ; 
                             end
                     end           
-                4'd6://四线模式地址从低到高读0
+                4'd6://单线模式地址从低到高读0
                     begin
 						if(wr_req)
 							begin
@@ -167,9 +134,9 @@ begin
 									end
 								else 
 									begin 
-										R_flash_cmd <= 8'h6B            ; 
+										R_flash_cmd <= 8'h02            ; 
 										R_flash_addr<= R_addr_cnt       ; 
-										R_cmd_type  <= 5'b1_1001        ; 
+										R_cmd_type  <= 5'b1_0101        ; 
 									end
 							end
 						else
@@ -183,7 +150,7 @@ begin
                 4'd7:// 结束状态
                     begin
                         R_flash_cmd <= 8'h00            ; 
-                        R_state     <= 4'd10            ;
+                        R_state     <= 4'd0            	;
                         R_cmd_type  <= 5'b0_0000        ; 
                     end
                 default :   R_state     <= 4'd0         ;

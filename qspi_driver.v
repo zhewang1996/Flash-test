@@ -1,44 +1,24 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:37:43 11/29/2019 
-// Design Name: 
-// Module Name:    QUAD_qspi_driver 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
-//
-// Dependencies: 
-//
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
-//
-//////////////////////////////////////////////////////////////////////////////////
 module qspi_driver(
-output                  O_qspi_clk          , // QSPI Flash Quad SPI(QPI)总线串行时钟线
-output reg              O_qspi_cs           , // QPI总线片选信号
-inout                   IO_qspi_io0         , // QPI总线输入/输出信号线
-inout                   IO_qspi_io1         , // QPI总线输入/输出信号线
-inout                   IO_qspi_io2         , // QPI总线输入/输出信号线
-inout                   IO_qspi_io3         , // QPI总线输入/输出信号线
-                                            
-input                   I_rst_n             , // 复位信号
-
-input                   I_clk_25M           , // 25MHz时钟信号
-input       [4:0]       I_cmd_type          , // 命令类型
-input       [7:0]       I_cmd_code          , // 命令码
-input       [23:0]      I_qspi_addr         , // QSPI Flash地址
-input       [15:0]      I_status_reg        , // QSPI Flash状态寄存器的值
-input       [7:0]       I_test_vec          , // 测试向量
-
-output reg              O_done_sig          , // 指令执行结束标志
-output reg  [7:0]       O_read_data         , // 从QSPI Flash读出的数据
-output reg              O_read_byte_valid   , // 读一个字节完成的标志
-output reg  [3:0]       O_qspi_state          // 状态机，用于在顶层调试用
+	output                  O_qspi_clk          , // QSPI Flash Quad SPI(QPI)总线串行时钟线
+	output reg              O_qspi_cs           , // QPI总线片选信号
+	inout                   IO_qspi_io0         , // QPI总线输入/输出信号线
+	inout                   IO_qspi_io1         , // QPI总线输入/输出信号线
+	inout                   IO_qspi_io2         , // QPI总线输入/输出信号线
+	inout                   IO_qspi_io3         , // QPI总线输入/输出信号线
+												
+	input                   I_rst_n             , // 复位信号
+	
+	input                   I_clk_25M           , // 25MHz时钟信号
+	input       [4:0]       I_cmd_type          , // 命令类型
+	input       [7:0]       I_cmd_code          , // 命令码
+	input       [23:0]      I_qspi_addr         , // QSPI Flash地址
+	input       [15:0]      I_status_reg        , // QSPI Flash状态寄存器的值
+	input       [7:0]       I_test_vec          , // 测试向量
+	
+	output reg              O_done_sig          , // 指令执行结束标志
+	output reg  [7:0]       O_read_data         , // 从QSPI Flash读出的数据
+	output reg              O_read_byte_valid   , // 读一个字节完成的标志
+	output reg  [3:0]       O_qspi_state          // 状态机，用于在顶层调试用
 );
 
 
@@ -50,8 +30,8 @@ parameter   C_WRITE_DATA      =   4'b0100  ; // 4_单线模式写数据到QSPI Flash
 parameter   C_WRITE_STATE_REG =   4'b0101  ; // 5_写状态寄存器
 parameter   C_WRITE_DATA_QUAD =   4'b0110  ; // 6_四线模式写数据到QSPI Flash
 parameter   C_DUMMY           =   4'b0111  ; // 7_四线模式读数据需要10个时钟周期的dummy clock，这可以加快读数据的速度
-parameter   C_READ_WAIT_QUAD  =   4'b1001  ; // 8_四线模式读等待状态
-parameter   C_FINISH_DONE     =   4'b1010  ; // 9_一条指令执行结束
+parameter   C_READ_WAIT_QUAD  =   4'b1000  ; // 8_四线模式读等待状态
+parameter   C_FINISH_DONE     =   4'b1001  ; // 9_一条指令执行结束
 
 
 // QSPI Flash IO输入输出状态控制寄存器
@@ -84,7 +64,7 @@ reg                 R_read_finish       ; // 读数据结束标志位
 
 
 assign O_qspi_clk = R_qspi_clk_en ? I_clk_25M : 0   ; // 产生串行时钟信号
-//assign W_rom_addr = R_write_bytes_cnt               ;
+
 
 // QSPI IO方向控制
 assign IO_qspi_io0     =   R_qspi_io0_out_en ? R_qspi_io0 : 1'bz ;                
