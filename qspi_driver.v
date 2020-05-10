@@ -204,7 +204,7 @@ begin
                                 else if (I_cmd_type[3:0] == 4'b0111) // 读数据(Read Data)指令
                                     begin
                                         O_qspi_state        <=  C_READ_WAIT     ;
-                                        R_read_bytes_num    <=  1               ;   //接收1个数据        
+                                        R_read_bytes_num    <=  256             ;   //接收256个数据        
                                     end 
                                 else if (I_cmd_type[3:0] == 4'b1000) 
                                     begin   //如果是四线模式页编程指令(Quad Page Program)                               
@@ -214,7 +214,7 @@ begin
                                 else if (I_cmd_type[3:0] == 4'b1001) 
                                     begin   //如果是四线读操作                               
                                         O_qspi_state        <=  C_DUMMY         ;
-                                        R_read_bytes_num    <=  1               ; //接收1个数据    
+                                        R_read_bytes_num    <=  256             ; //接收256个数据    
                                         R_write_bits_cnt    <=  9               ; //10个dummy clock                    
                                     end 
                             end
@@ -281,7 +281,7 @@ begin
                         R_qspi_io1_out_en   <=  1'b1    ;   // 设置IO1为输出
                         R_qspi_io2_out_en   <=  1'b1    ;   // 设置IO2为输出
                         R_qspi_io3_out_en   <=  1'b1    ;   // 设置IO3为输出                          
-                        if(R_write_bytes_cnt == 9'd1)
+                        if(R_write_bytes_cnt == 9'd256)
                             begin
                                 O_qspi_state   <=  C_FINISH_DONE    ;    
                                 R_qspi_clk_en  <=  1'b0             ; 

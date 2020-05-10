@@ -31,16 +31,16 @@ parameter  DES_IP    = {8'd192,8'd168,8'd1,8'd102};
 //输入数据IO延时,此处为0,即不延时(如果为n,表示延时n*78ps) 
 parameter IDELAY_VALUE = 16;
 
-wire          	I_rst_n          	;// 系统复位
-wire          	clk_25M          	;// 25MHz全局时钟
+(* mark_debug = "true" *)wire          	I_rst_n          	;// 系统复位
+(* mark_debug = "true" *)wire          	clk_25M          	;// 25MHz全局时钟
 wire          	clk_200M         	;// 用于IO延时的时钟(IDELAYCTRL原语的参考时钟频率)    
 wire          	W_done_sig       	;// 指令执行结束标志
-wire [7:0]    	W_read_data      	;// 从QSPI Flash读出的数据
+(* mark_debug = "true" *)wire [7:0]    	W_read_data      	;// 从QSPI Flash读出的数据
 wire          	W_read_byte_valid	;// 读一个字节完成的标志
-wire		  	W_qspi_state	 	;//	状态机，用于在顶层调用
+(* mark_debug = "true" *)wire [3:0]		W_qspi_state	 	;//	状态机，用于在顶层调用
 wire [4:0]    	R_cmd_type       	;// 命令类型
-wire [7:0]    	R_flash_cmd 		;//	命令码
-wire [23:0]   	R_flash_addr		;//	Flash地址
+(* mark_debug = "true" *)wire [7:0]    	R_flash_cmd 		;//	命令码
+(* mark_debug = "true" *)wire [23:0]   	R_flash_addr		;//	Flash地址
 wire [15:0]   	R_status_reg     	;// 输入状态寄存器的值
 wire [7:0]    	R_test_vec       	;// 测试向量，决定写0还是写1
 	
@@ -57,13 +57,13 @@ wire  [31:0]  	rec_data      ; //UDP接收的数据
 wire  [15:0]  	rec_byte_num  ; //UDP接收的有效字节数 单位:byte 
 wire  [15:0]  	tx_byte_num   ; //UDP发送的有效字节数 单位:byte 
 wire          	udp_tx_done   ; //UDP发送完成信号
-wire          	tx_req        ; //UDP读数据请求信号
-wire  [31:0]  	tx_data       ; //UDP待发送数据	
-wire  			tx_start_en	  ;								 
+(* mark_debug = "true" *)wire          	tx_req        ; //UDP读数据请求信号
+(* mark_debug = "true" *)wire  [31:0]  	tx_data       ; //UDP待发送数据	
+(* mark_debug = "true" *)wire  			tx_start_en	  ;								 
 	
 wire 		  	rd_rst			;//FIFO读复位信号
 wire			wr_rst			;//FIFO写复位信号
-wire  [8:0]		rd_data_count	;
+(* mark_debug = "true" *)wire  [8:0]		rd_data_count	;
 wire  [10:0]	wr_data_count	;
 wire          	rd_req    		;//读数据请求信号
 wire          	wr_req			;//写数据请求信号
@@ -89,12 +89,11 @@ pll u_pll
 
 qspi_control U_qspi_control
 (
-.clk_25M               (clk_25M			), 
-.I_rst_n             (I_rst_n			),
+.clk_25M             (clk_25M			), 
+.I_rst_n             (I_rst_n & locked	),
 					 
 .W_done_sig          (W_done_sig		),
 .W_read_data         (W_read_data		),
-.wr_req              (wr_req			),
 					 
 .R_cmd_type          (R_cmd_type		),
 .R_flash_cmd         (R_flash_cmd		),
@@ -112,7 +111,7 @@ qspi_driver U_qspi_driver
 .IO_qspi_io2         (IO_qspi_io2       ), // QPI总线输入/输出信号线
 .IO_qspi_io3         (IO_qspi_io3       ), // QPI总线输入/输出信号线
                    
-.I_rst_n             (I_rst_n           ), // 复位信号
+.I_rst_n             (I_rst_n & locked  ), // 复位信号
 
 .I_clk_25M           (clk_25M           ), // 25MHz时钟信号
 .I_cmd_type          (R_cmd_type        ), // 命令类型
